@@ -1,0 +1,15 @@
+seed: 42
+
+split:
+  test_size: 0.2
+  stratify: true
+
+train:
+  epochs: 25
+  lr: 0.01
+
+model:
+  alpha: 0.0001
+
+eval:
+  average: "macro"
