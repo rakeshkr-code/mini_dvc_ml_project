@@ -1,0 +1,113 @@
+schema: '2.0'
+stages:
+  data_load:
+    cmd: python src/data_load.py --out data/raw/iris.csv
+    deps:
+    - path: src/data_load.py
+      hash: md5
+      md5: 3fe128431cb2557d86c6ba99270b0b45
+      size: 517
+      isexec: true
+    outs:
+    - path: data/raw/iris.csv
+      hash: md5
+      md5: ac2c33e860a72a79bbc3437ca80c355c
+      size: 2776
+      isexec: true
+  data_split:
+    cmd: python src/data_split.py --params params.yaml --in data/raw/iris.csv 
+      --train-out data/processed/train.csv --test-out data/processed/test.csv
+    deps:
+    - path: data/raw/iris.csv
+      hash: md5
+      md5: ac2c33e860a72a79bbc3437ca80c355c
+      size: 2776
+      isexec: true
+    - path: src/data_split.py
+      hash: md5
+      md5: 2b8b53b55c7fe8cc4c30ce15edc1034e
+      size: 1549
+      isexec: true
+    params:
+      params.yaml:
+        seed: 42
+        split.stratify: true
+        split.test_size: 0.2
+    outs:
+    - path: data/processed/test.csv
+      hash: md5
+      md5: 1a28009c4eb6c9bbf0e56f0b8dab914a
+      size: 616
+      isexec: true
+    - path: data/processed/train.csv
+      hash: md5
+      md5: 5f3d3b12e9af14f2d45821064cdbe8e9
+      size: 2236
+      isexec: true
+  train:
+    cmd: python src/train.py --params params.yaml --train 
+      data/processed/train.csv --model-out models/iris_model.joblib 
+      --history-out reports/train_history.csv
+    deps:
+    - path: data/processed/train.csv
+      hash: md5
+      md5: 5f3d3b12e9af14f2d45821064cdbe8e9
+      size: 2236
+      isexec: true
+    - path: src/train.py
+      hash: md5
+      md5: f8f11bb5c757297373488474ffc5db0a
+      size: 2329
+      isexec: true
+    params:
+      params.yaml:
+        model.alpha: 0.0001
+        seed: 42
+        train.epochs: 25
+        train.lr: 0.01
+    outs:
+    - path: models/iris_model.joblib
+      hash: md5
+      md5: f3a3ac54080fdb6283682a2a21a5c7fb
+      size: 1754
+      isexec: true
+    - path: reports/train_history.csv
+      hash: md5
+      md5: d4ffcd0e213971ff9fa93c8fa34bdf9c
+      size: 907
+      isexec: true
+  eval:
+    cmd: python src/eval.py --params params.yaml --test data/processed/test.csv 
+      --model models/iris_model.joblib --metrics-out reports/metrics.json 
+      --confmat-out reports/confusion_matrix.png
+    deps:
+    - path: data/processed/test.csv
+      hash: md5
+      md5: 1a28009c4eb6c9bbf0e56f0b8dab914a
+      size: 616
+      isexec: true
+    - path: models/iris_model.joblib
+      hash: md5
+      md5: f3a3ac54080fdb6283682a2a21a5c7fb
+      size: 1754
+      isexec: true
+    - path: src/eval.py
+      hash: md5
+      md5: 8338870eba10cea71ec10ef9247a2b9a
+      size: 2391
+      isexec: true
+    params:
+      params.yaml:
+        eval.average: macro
+        seed: 42
+    outs:
+    - path: reports/confusion_matrix.png
+      hash: md5
+      md5: 61b43e7e690b1d08570a0dca617fa0b2
+      size: 18189
+      isexec: true
+    - path: reports/metrics.json
+      hash: md5
+      md5: f4ba9188b19fbbaa52865330b4d731eb
+      size: 138
+      isexec: true
