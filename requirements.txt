@@ -1,0 +1,5 @@
+dvc
+pandas
+scikit-learn
+matplotlib
+joblib

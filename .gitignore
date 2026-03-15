@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.ipynb_checkpoints/
+
+# Virtual environment
+.venv/
+venv/
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# DVC internal files
+.dvc/cache/
+.dvc/tmp/
+
+# Generated ML artifacts
+data/raw/
+data/processed/
+models/
+reports/
+
+# Keep these tracked
+!dvc.yaml
+!dvc.lock
+!params.yaml
+!src/
+!requirements.txt

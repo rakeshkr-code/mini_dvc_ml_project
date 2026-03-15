@@ -1,0 +1,4 @@
+[core]
+    remote = mylocal_dvcstore
+['remote "mylocal_dvcstore"']
+    url = /mnt/c/Users/Rakesh-PC/Documents/1_MLOps_Campus_Course_GitHubSSH/tmp/dvcstorage_practice_3/
