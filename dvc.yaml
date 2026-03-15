@@ -1,0 +1,52 @@
+stages:
+  data_load:
+    cmd: python src/data_load.py --out data/raw/iris.csv
+    deps:
+    - src/data_load.py
+    outs:
+    - data/raw/iris.csv
+  data_split:
+    cmd: python src/data_split.py --params params.yaml --in data/raw/iris.csv 
+      --train-out data/processed/train.csv --test-out data/processed/test.csv
+    deps:
+    - data/raw/iris.csv
+    - src/data_split.py
+    params:
+    - seed
+    - split.stratify
+    - split.test_size
+    outs:
+    - data/processed/test.csv
+    - data/processed/train.csv
+  train:
+    cmd: python src/train.py --params params.yaml --train 
+      data/processed/train.csv --model-out models/iris_model.joblib 
+      --history-out reports/train_history.csv
+    deps:
+    - data/processed/train.csv
+    - src/train.py
+    params:
+    - model.alpha
+    - seed
+    - train.epochs
+    - train.lr
+    outs:
+    - models/iris_model.joblib
+    plots:
+    - reports/train_history.csv
+  eval:
+    cmd: python src/eval.py --params params.yaml --test data/processed/test.csv 
+      --model models/iris_model.joblib --metrics-out reports/metrics.json 
+      --confmat-out reports/confusion_matrix.png
+    deps:
+    - data/processed/test.csv
+    - models/iris_model.joblib
+    - src/eval.py
+    params:
+    - eval.average
+    - seed
+    metrics:
+    - reports/metrics.json:
+        cache: false
+    plots:
+    - reports/confusion_matrix.png
