@@ -6,6 +6,7 @@ import joblib
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import yaml
 from sklearn.metrics import (
     accuracy_score,
     confusion_matrix,
@@ -15,7 +16,15 @@ from sklearn.metrics import (
 )
 
 
-def main(test_path, model_path, metrics_out, confmat_out, average):
+def load_params(params_path: str) -> dict:
+    with open(params_path, "r", encoding="utf-8") as f:
+        return yaml.safe_load(f)
+
+
+def main(params_path, test_path, model_path, metrics_out, confmat_out):
+    params = load_params(params_path)
+    average = params["eval"]["average"]
+
     df = pd.read_csv(test_path)
     X = df.drop(columns=["label"]).values
     y = df["label"].values
@@ -35,6 +44,7 @@ def main(test_path, model_path, metrics_out, confmat_out, average):
         "precision": precision_score(y, pred, average=average, zero_division=0),
         "recall": recall_score(y, pred, average=average, zero_division=0),
         "f1": f1_score(y, pred, average=average, zero_division=0),
+        "average": average,
     }
 
     Path(metrics_out).parent.mkdir(parents=True, exist_ok=True)
@@ -60,11 +70,11 @@ def main(test_path, model_path, metrics_out, confmat_out, average):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument("--params", required=True)
     parser.add_argument("--test", required=True)
     parser.add_argument("--model", required=True)
     parser.add_argument("--metrics-out", required=True)
     parser.add_argument("--confmat-out", required=True)
-    parser.add_argument("--average", required=True)
     args = parser.parse_args()
 
-    main(args.test, args.model, args.metrics_out, args.confmat_out, args.average)
+    main(args.params, args.test, args.model, args.metrics_out, args.confmat_out)

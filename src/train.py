@@ -4,12 +4,25 @@ from pathlib import Path
 import joblib
 import numpy as np
 import pandas as pd
+import yaml
 from sklearn.linear_model import SGDClassifier
 from sklearn.metrics import accuracy_score, log_loss
 from sklearn.preprocessing import StandardScaler
 
 
-def main(train_path, model_out, history_out, seed, epochs, lr, alpha):
+def load_params(params_path: str) -> dict:
+    with open(params_path, "r", encoding="utf-8") as f:
+        return yaml.safe_load(f)
+
+
+def main(params_path, train_path, model_out, history_out):
+    params = load_params(params_path)
+
+    seed = params["seed"]
+    epochs = params["train"]["epochs"]
+    lr = params["train"]["lr"]
+    alpha = params["model"]["alpha"]
+
     df = pd.read_csv(train_path)
     X = df.drop(columns=["label"]).values
     y = df["label"].values
@@ -61,21 +74,10 @@ def main(train_path, model_out, history_out, seed, epochs, lr, alpha):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument("--params", required=True)
     parser.add_argument("--train", required=True)
     parser.add_argument("--model-out", required=True)
     parser.add_argument("--history-out", required=True)
-    parser.add_argument("--seed", type=int, required=True)
-    parser.add_argument("--epochs", type=int, required=True)
-    parser.add_argument("--lr", type=float, required=True)
-    parser.add_argument("--alpha", type=float, required=True)
     args = parser.parse_args()
 
-    main(
-        args.train,
-        args.model_out,
-        args.history_out,
-        args.seed,
-        args.epochs,
-        args.lr,
-        args.alpha,
-    )
+    main(args.params, args.train, args.model_out, args.history_out)
